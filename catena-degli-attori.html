@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ciak! — La Catena degli Attori</title>
+<style>
+  :root{
+    --bg: #1b1410;
+    --bg-elevated: #241b16;
+    --bg-card: #2c211a;
+    --gold: #c9a227;
+    --gold-dim: #8a7020;
+    --burgundy: #7a1f2b;
+    --cream: #f2e8d5;
+    --cream-dim: #c9bda3;
+    --teal: #2f6b5e;
+    --teal-bright: #4a9484;
+    --amber: #c9742f;
+    --amber-bright: #e8924a;
+    --error: #b3413a;
+    --display: 'Arial Black', 'Helvetica Neue', Arial, sans-serif;
+    --body: Georgia, 'Times New Roman', serif;
+    --mono: 'Courier New', Courier, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: var(--bg);
+    background-image:
+      radial-gradient(ellipse at top, rgba(201,162,39,0.06), transparent 60%),
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 1px, transparent 1px, transparent 3px);
+    color: var(--cream);
+    font-family: var(--body);
+    min-height: 100vh;
+    padding: 24px 16px 60px;
+  }
+
+  .wrap{ max-width: 640px; margin: 0 auto; }
+
+  .slate{
+    background: linear-gradient(135deg, #14100c, #1f1712);
+    border: 1px solid #3a2c20;
+    border-radius: 6px;
+    padding: 16px 18px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+  .slate::before{
+    content:"";
+    position:absolute; top:0; left:0; right:0; height:14px;
+    background: repeating-linear-gradient(45deg, var(--cream) 0 14px, #1b1410 14px 28px);
+    opacity:0.9;
+  }
+  .slate-inner{ margin-top: 16px; display:flex; align-items:flex-end; justify-content:space-between; gap:12px; flex-wrap: wrap;}
+  .logo{
+    font-family: var(--display);
+    font-size: 32px;
+    letter-spacing: 1px;
+    color: var(--gold);
+    text-transform: uppercase;
+    line-height: 1;
+  }
+  .logo span{ color: var(--cream); }
+  .slate-meta{
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--cream-dim);
+    text-align:right;
+    line-height: 1.6;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .slate-meta b{ color: var(--amber-bright); }
+
+  .mascot-row{
+    margin-top: 14px;
+    display:flex;
+    align-items: flex-end;
+    gap: 12px;
+  }
+  .mascot-figure{
+    width: 84px; height: 84px;
+    flex-shrink: 0;
+    transition: transform 0.18s ease;
+  }
+  .mascot-figure.bounce{ animation: mascotBounce 0.5s ease; }
+  .mascot-figure.shake{ animation: mascotShake 0.45s ease; }
+  @keyframes mascotBounce{
+    0%{ transform: translateY(0) scale(1); }
+    30%{ transform: translateY(-10px) scale(1.05); }
+    55%{ transform: translateY(0) scale(0.98); }
+    100%{ transform: translateY(0) scale(1); }
+  }
+  @keyframes mascotShake{
+    0%,100%{ transform: translateX(0); }
+    25%{ transform: translateX(-5px) rotate(-3deg); }
+    75%{ transform: translateX(5px) rotate(3deg); }
+  }
+  .sparkle{ opacity: 0; transition: opacity 0.2s ease; }
+  .sparkle.show{ opacity: 1; animation: sparklePulse 1.1s ease; }
+  @keyframes sparklePulse{
+    0%{ opacity:0; transform: scale(0.4); }
+    40%{ opacity:1; transform: scale(1.1); }
+    100%{ opacity:0; transform: scale(1.3); }
+  }
+  .mascot-bubble{
+    flex:1;
+    background: var(--bg-elevated);
+    border: 1px solid #3a2c20;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--cream);
+    position: relative;
+    min-height: 20px;
+  }
+  .mascot-bubble::before{
+    content:"";
+    position:absolute; left:-7px; bottom: 16px;
+    width:0; height:0;
+    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+    border-right: 7px solid var(--bg-elevated);
+  }
+  .mascot-name{
+    font-family: var(--mono);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--amber-bright);
+    display:block;
+    margin-bottom: 3px;
+  }
+
+  .profile-bar{
+    margin-top: 12px;
+    display:flex;
+    align-items:center;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--cream-dim);
+  }
+  .streak-pill{
+    background: var(--bg-elevated);
+    border: 1px solid var(--gold-dim);
+    border-radius: 20px;
+    padding: 4px 10px;
+    color: var(--amber-bright);
+  }
+  .level-pill{
+    background: var(--bg-elevated);
+    border: 1px solid var(--gold-dim);
+    border-radius: 20px;
+    padding: 4px 10px;
+  }
+  .xp-wrap{ flex:1; min-width: 100px; }
+  .xp-track{
+    height: 6px;
+    background: var(--bg-elevated);
+    border-radius: 4px;
+    overflow:hidden;
+    border: 1px solid #3a2c20;
+  }
+  .xp-fill{
+    height:100%;
+    background: linear-gradient(90deg, var(--amber), var(--gold));
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+  .week-row{
+    margin-top: 10px;
+    display:flex;
+    gap: 5px;
+  }
+  .week-day{
+    width: 20px; height: 20px;
+    border-radius: 4px;
+    background: var(--bg-elevated);
+    border: 1px solid #3a2c20;
+  }
+  .week-day.won{ background: var(--teal-bright); border-color: var(--teal-bright); }
+  .week-day.played{ background: var(--amber); border-color: var(--amber); }
+
+  .goal{
+    margin-top: 18px;
+    background: var(--bg-elevated);
+    border: 1px solid #3a2c20;
+    border-radius: 6px;
+    padding: 14px 16px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    flex-wrap: wrap;
+  }
+  .goal-node{ display:flex; flex-direction:column; gap:2px; }
+  .goal-label{ font-family: var(--mono); font-size: 10px; color: var(--cream-dim); text-transform:uppercase; letter-spacing: 1px;}
+  .goal-name{ font-family: var(--display); font-size: 16px; color: var(--cream); text-transform: uppercase; }
+  .goal-arrow{ color: var(--gold-dim); font-size: 20px; }
+
+  .chain{
+    margin-top: 18px;
+    position: relative;
+    padding-left: 28px;
+  }
+  .chain::before{
+    content:"";
+    position:absolute; left:10px; top:6px; bottom:6px; width:2px;
+    background: repeating-linear-gradient(0deg, var(--gold-dim) 0 4px, transparent 4px 10px);
+  }
+  .node{
+    position: relative;
+    margin-bottom: 14px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    animation: rise 0.35s ease;
+  }
+  @keyframes rise{
+    from{ opacity:0; transform: translateY(8px);}
+    to{ opacity:1; transform: translateY(0);}
+  }
+  .node::before{
+    content:"";
+    position:absolute; left:-24px; top:50%; transform:translateY(-50%);
+    width:10px; height:10px; border-radius:50%;
+    background: var(--gold);
+    box-shadow: 0 0 0 3px var(--bg);
+  }
+  .node-card{
+    flex:1;
+    padding: 10px 14px;
+    border-radius: 5px;
+    font-family: var(--display);
+    font-size: 14px;
+    letter-spacing: 0.3px;
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    gap: 8px;
+    text-transform: uppercase;
+  }
+  .node-card.attore{
+    background: linear-gradient(135deg, var(--amber), #a85f24);
+    color: #2a1605;
+  }
+  .node-card.film{
+    background: linear-gradient(135deg, var(--teal), #1f4a40);
+    color: #eafff8;
+    border-radius: 3px;
+  }
+  .node-tag{ font-family: var(--mono); font-size: 9px; opacity:0.75; text-transform:uppercase; }
+  .node-card.target{
+    background: var(--bg-card);
+    border: 2px dashed var(--gold-dim);
+    color: var(--cream-dim);
+  }
+
+  .input-row{
+    margin-top: 18px;
+    position: relative;
+  }
+  .input-hint{
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--cream-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .input-hint b{ color: var(--amber-bright); }
+  input[type=text]{
+    width: 100%;
+    background: var(--bg-elevated);
+    border: 1px solid #4a3a2a;
+    color: var(--cream);
+    font-family: var(--body);
+    font-size: 16px;
+    padding: 12px 14px;
+    border-radius: 5px;
+    outline: none;
+  }
+  input[type=text]:focus{ border-color: var(--gold); }
+  input[type=text]:disabled{ opacity: 0.5; }
+
+  .autocomplete{
+    position:absolute;
+    left:0; right:0; top: calc(100% + 4px);
+    background: var(--bg-card);
+    border: 1px solid #4a3a2a;
+    border-radius: 5px;
+    max-height: 220px;
+    overflow-y:auto;
+    z-index: 10;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.5);
+  }
+  .ac-item{
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 14px;
+    display:flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #3a2c20;
+  }
+  .ac-item:last-child{ border-bottom:none; }
+  .ac-item:hover, .ac-item.active{ background: var(--burgundy); color: var(--cream); }
+  .ac-tag{ font-family: var(--mono); font-size: 9px; color: var(--cream-dim); text-transform: uppercase; align-self:center;}
+
+  .error-msg{
+    margin-top: 8px;
+    color: var(--error);
+    font-family: var(--mono);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    min-height: 16px;
+  }
+
+  .controls{
+    margin-top: 16px;
+    display:flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  button{
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 12px;
+    padding: 10px 14px;
+    border-radius: 5px;
+    border: 1px solid #4a3a2a;
+    background: var(--bg-elevated);
+    color: var(--cream-dim);
+    cursor: pointer;
+  }
+  button:hover{ border-color: var(--gold); color: var(--cream); }
+  button.primary{
+    background: var(--burgundy);
+    border-color: var(--burgundy);
+    color: var(--cream);
+  }
+  button:disabled{ opacity:0.4; cursor: default; }
+
+  .clap-overlay{
+    position: fixed; inset: 0;
+    pointer-events: none;
+    display:flex; align-items:center; justify-content:center;
+    z-index: 50;
+  }
+  .clap-bar{
+    position:absolute;
+    left:0; right:0; height: 50%;
+    background: repeating-linear-gradient(45deg, var(--cream) 0 18px, #14100c 18px 36px);
+    transform-origin: center;
+  }
+  .clap-bar.top{ top:0; transform: rotate(0deg) translateY(-100%); }
+  .clap-bar.bottom{ bottom:0; transform: rotate(0deg) translateY(100%); }
+  .clap-overlay.go .clap-bar.top{ animation: clapTop 0.32s ease forwards; }
+  .clap-overlay.go .clap-bar.bottom{ animation: clapBottom 0.32s ease forwards; }
+  @keyframes clapTop{
+    0%{ transform: translateY(-100%); }
+    45%{ transform: translateY(0%); }
+    100%{ transform: translateY(-100%); }
+  }
+  @keyframes clapBottom{
+    0%{ transform: translateY(100%); }
+    45%{ transform: translateY(0%); }
+    100%{ transform: translateY(100%); }
+  }
+
+  .result{
+    margin-top: 20px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--gold-dim);
+    border-radius: 6px;
+    padding: 18px;
+    display:none;
+  }
+  .result.show{ display:block; animation: rise 0.4s ease; }
+  .result h3{
+    margin:0 0 6px;
+    font-family: var(--display);
+    text-transform: uppercase;
+    color: var(--gold);
+    font-size: 20px;
+  }
+  .result p{ margin: 4px 0; color: var(--cream-dim); font-size: 14px; }
+  .squares{ font-size: 20px; letter-spacing: 3px; margin: 10px 0; }
+  .share-btn{ margin-top: 8px; }
+
+  .footer-note{
+    margin-top: 28px;
+    text-align:center;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--cream-dim);
+    opacity: 0.6;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .node, .result, .clap-overlay.go .clap-bar.top, .clap-overlay.go .clap-bar.bottom, .mascot-figure.bounce, .mascot-figure.shake, .sparkle.show{ animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="slate">
+    <div class="slate-inner">
+      <div class="logo"><span>CIAK!</span> · CATENA</div>
+      <div class="slate-meta">
+        SFIDA DEL GIORNO <b id="dayNum">#1</b><br>
+        SCENA <b id="stepCount">0</b> · MIGLIORE <b id="optimalCount">—</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="mascot-row">
+    <svg class="mascot-figure" id="mascotFigure" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+      <g id="sparkles">
+        <path class="sparkle s1" d="M18 30 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3 z" fill="#c9a227"/>
+        <path class="sparkle s2" d="M140 24 l2.5 6 l6 2.5 l-6 2.5 l-2.5 6 l-2.5 -6 l-6 -2.5 l6 -2.5 z" fill="#e8924a"/>
+        <path class="sparkle s3" d="M150 70 l2 5 l5 2 l-5 2 l-2 5 l-2 -5 l-5 -2 l5 -2 z" fill="#f2e8d5"/>
+      </g>
+      <g fill="#f2e8d5">
+        <circle cx="42" cy="58" r="20"/>
+        <circle cx="68" cy="44" r="22"/>
+        <circle cx="96" cy="46" r="22"/>
+        <circle cx="120" cy="60" r="19"/>
+        <circle cx="55" cy="72" r="16"/>
+        <circle cx="105" cy="72" r="16"/>
+      </g>
+      <g fill="#e3d6b0">
+        <circle cx="50" cy="50" r="9"/>
+        <circle cx="90" cy="38" r="8"/>
+        <circle cx="112" cy="55" r="8"/>
+      </g>
+      <path d="M38 92 L122 92 L110 156 L50 156 Z" fill="#f2e8d5"/>
+      <g clip-path="url(#bucketClip)">
+        <rect x="38" y="92" width="14" height="64" fill="#7a1f2b"/>
+        <rect x="66" y="92" width="14" height="64" fill="#7a1f2b"/>
+        <rect x="94" y="92" width="14" height="64" fill="#7a1f2b"/>
+      </g>
+      <defs>
+        <clipPath id="bucketClip">
+          <path d="M38 92 L122 92 L110 156 L50 156 Z"/>
+        </clipPath>
+      </defs>
+      <path d="M38 92 L122 92 L110 156 L50 156 Z" fill="none" stroke="#1b1410" stroke-width="2"/>
+      <ellipse cx="65" cy="78" rx="9" ry="11" fill="#1b1410"/>
+      <ellipse cx="95" cy="78" rx="9" ry="11" fill="#1b1410"/>
+      <circle cx="67" cy="75" r="2.6" fill="#f2e8d5"/>
+      <circle cx="97" cy="75" r="2.6" fill="#f2e8d5"/>
+      <path id="eyebrowL" d="M55 60 L74 58" stroke="#1b1410" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+      <path id="eyebrowR" d="M86 58 L105 60" stroke="#1b1410" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+      <path id="mascotMouth" d="M70 96 Q80 104 90 96" stroke="#1b1410" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+    </svg>
+    <div class="mascot-bubble">
+      <span class="mascot-name">Pop</span>
+      <span id="mascotText">Ciao! Sono Pop 🍿 Pronto per la sfida di oggi?</span>
+    </div>
+  </div>
+
+  <div class="profile-bar">
+    <div class="streak-pill">🔥 <span id="streakCount">0</span> giorni</div>
+    <div class="level-pill">Liv. <span id="levelNum">1</span></div>
+    <div class="xp-wrap">
+      <div class="xp-track"><div class="xp-fill" id="xpFill"></div></div>
+    </div>
+  </div>
+  <div class="week-row" id="weekRow"></div>
+
+  <div class="goal">
+    <div class="goal-node">
+      <div class="goal-label">Si parte da</div>
+      <div class="goal-name" id="startName">—</div>
+    </div>
+    <div class="goal-arrow">⟶</div>
+    <div class="goal-node" style="text-align:right">
+      <div class="goal-label">Si arriva a</div>
+      <div class="goal-name" id="targetName">—</div>
+    </div>
+  </div>
+
+  <div class="chain" id="chain"></div>
+
+  <div class="input-row">
+    <div class="input-hint">Prossimo anello: <b id="nextTypeHint">attore</b> collegato all'ultimo nome della catena</div>
+    <input type="text" id="guessInput" autocomplete="off" placeholder="Scrivi un nome..." />
+    <div class="autocomplete" id="autocomplete" style="display:none;"></div>
+    <div class="error-msg" id="errorMsg"></div>
+  </div>
+
+  <div class="controls">
+    <button class="primary" id="newGameBtn">Nuova partita casuale</button>
+    <button id="giveUpBtn">Mostra soluzione</button>
+  </div>
+
+  <div class="result" id="result">
+    <h3 id="resultTitle">Catena completata!</h3>
+    <p id="resultDetail"></p>
+    <div class="squares" id="resultSquares"></div>
+    <button class="primary share-btn" id="shareBtn">Copia per condividere</button>
+  </div>
+
+  <div class="footer-note">Collega film e attori reali, un passaggio alla volta · TMDb-style data demo</div>
+</div>
+
+<div class="clap-overlay" id="clapOverlay">
+  <div class="clap-bar top"></div>
+  <div class="clap-bar bottom"></div>
+</div>
+
+<script>
+const MOVIES = [
+  ["Inception", 2010, ["Leonardo DiCaprio","Joseph Gordon-Levitt","Elliot Page","Tom Hardy","Marion Cotillard","Cillian Murphy"]],
+  ["Titanic", 1997, ["Leonardo DiCaprio","Kate Winslet","Billy Zane","Kathy Bates"]],
+  ["The Wolf of Wall Street", 2013, ["Leonardo DiCaprio","Jonah Hill","Margot Robbie","Matthew McConaughey"]],
+  ["Once Upon a Time in Hollywood", 2019, ["Leonardo DiCaprio","Brad Pitt","Margot Robbie","Al Pacino"]],
+  ["Fight Club", 1999, ["Brad Pitt","Edward Norton","Helena Bonham Carter"]],
+  ["Ocean's Eleven", 2001, ["George Clooney","Brad Pitt","Matt Damon","Julia Roberts","Don Cheadle"]],
+  ["The Bourne Ultimatum", 2007, ["Matt Damon","Julia Stiles","David Strathairn"]],
+  ["Good Will Hunting", 1997, ["Matt Damon","Robin Williams","Ben Affleck","Minnie Driver"]],
+  ["Argo", 2012, ["Ben Affleck","Bryan Cranston","John Goodman"]],
+  ["Batman v Superman", 2016, ["Ben Affleck","Henry Cavill","Gal Gadot","Amy Adams"]],
+  ["Wonder Woman", 2017, ["Gal Gadot","Chris Pine","Robin Wright"]],
+  ["Star Trek", 2009, ["Chris Pine","Zachary Quinto","Zoe Saldana"]],
+  ["Avatar", 2009, ["Zoe Saldana","Sam Worthington","Sigourney Weaver"]],
+  ["Guardians of the Galaxy", 2014, ["Zoe Saldana","Chris Pratt","Bradley Cooper","Vin Diesel"]],
+  ["Jurassic World", 2015, ["Chris Pratt","Bryce Dallas Howard","Vincent D'Onofrio"]],
+  ["American Hustle", 2013, ["Bradley Cooper","Christian Bale","Amy Adams","Jennifer Lawrence"]],
+  ["The Dark Knight", 2008, ["Christian Bale","Heath Ledger","Aaron Eckhart","Michael Caine"]],
+  ["Silver Linings Playbook", 2012, ["Bradley Cooper","Jennifer Lawrence","Robert De Niro"]],
+  ["Hunger Games", 2012, ["Jennifer Lawrence","Josh Hutcherson","Liam Hemsworth","Woody Harrelson"]],
+  ["Zombieland", 2009, ["Woody Harrelson","Jesse Eisenberg","Emma Stone"]],
+  ["La La Land", 2016, ["Emma Stone","Ryan Gosling","J.K. Simmons"]],
+  ["Blade Runner 2049", 2017, ["Ryan Gosling","Harrison Ford","Ana de Armas"]],
+  ["Knives Out", 2019, ["Ana de Armas","Chris Evans","Daniel Craig","Jamie Lee Curtis"]],
+  ["Avengers: Endgame", 2019, ["Chris Evans","Robert Downey Jr.","Scarlett Johansson","Chris Hemsworth","Mark Ruffalo"]],
+  ["Iron Man", 2008, ["Robert Downey Jr.","Gwyneth Paltrow","Jeff Bridges","Terrence Howard"]],
+  ["Marriage Story", 2019, ["Scarlett Johansson","Adam Driver","Laura Dern"]],
+  ["Star Wars: The Force Awakens", 2015, ["Adam Driver","Daisy Ridley","Harrison Ford","Oscar Isaac"]],
+  ["Dune", 2021, ["Timothée Chalamet","Zendaya","Oscar Isaac","Rebecca Ferguson","Javier Bardem"]],
+  ["Call Me by Your Name", 2017, ["Timothée Chalamet","Armie Hammer","Michael Stuhlbarg"]],
+  ["Spider-Man: No Way Home", 2021, ["Zendaya","Tom Holland","Tobey Maguire","Andrew Garfield"]],
+  ["Spider-Man: Homecoming", 2017, ["Tom Holland","Robert Downey Jr.","Michael Keaton"]],
+  ["Birdman", 2014, ["Michael Keaton","Edward Norton","Emma Stone"]],
+  ["La Grande Bellezza", 2013, ["Toni Servillo","Carlo Verdone","Sabrina Ferilli"]],
+  ["Il Divo", 2008, ["Toni Servillo","Anna Bonaiuto"]],
+  ["Loro", 2018, ["Toni Servillo","Elena Sofia Ricci","Kasia Smutniak"]],
+  ["Perfetti Sconosciuti", 2016, ["Marco Giallini","Valerio Mastandrea","Edoardo Leo","Kasia Smutniak","Valeria Bruni Tedeschi"]],
+];
+
+const FILM = "film", ATTORE = "attore";
+function nodeId(type, name){ return type + "::" + name; }
+
+const adj = {};
+const allNodes = {};
+
+function addEdge(t1, n1, t2, n2){
+  const id1 = nodeId(t1, n1), id2 = nodeId(t2, n2);
+  allNodes[id1] = {type:t1, name:n1};
+  allNodes[id2] = {type:t2, name:n2};
+  if(!adj[id1]) adj[id1] = [];
+  if(!adj[id2]) adj[id2] = [];
+  if(!adj[id1].some(n=>nodeId(n.type,n.name)===id2)) adj[id1].push({type:t2, name:n2});
+  if(!adj[id2].some(n=>nodeId(n.type,n.name)===id1)) adj[id2].push({type:t1, name:n1});
+}
+
+MOVIES.forEach(([title, year, cast])=>{
+  cast.forEach(actor => addEdge(FILM, title, ATTORE, actor));
+});
+
+const movieYear = {};
+MOVIES.forEach(([title, year])=>{ movieYear[title] = year; });
+
+const allIds = Object.keys(allNodes);
+function neighbors(id){ return adj[id] || []; }
+
+function bfsPath(startId, targetId){
+  if(startId === targetId) return [startId];
+  const visited = new Set([startId]);
+  const prev = {};
+  const queue = [startId];
+  while(queue.length){
+    const cur = queue.shift();
+    for(const n of neighbors(cur)){
+      const nid = nodeId(n.type, n.name);
+      if(!visited.has(nid)){
+        visited.add(nid);
+        prev[nid] = cur;
+        if(nid === targetId){
+          const path = [nid];
+          let c = nid;
+          while(c !== startId){ c = prev[c]; path.unshift(c); }
+          return path;
+        }
+        queue.push(nid);
+      }
+    }
+  }
+  return null;
+}
+
+function mulberry32(seed){
+  return function(){
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function hashStr(s){
+  let h = 0;
+  for(let i=0;i<s.length;i++){ h = (Math.imul(31,h) + s.charCodeAt(i))|0; }
+  return h;
+}
+const LAUNCH_DATE = new Date("2026-01-01T00:00:00Z");
+function dayNumber(){
+  const now = new Date();
+  const utc = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.floor((utc - LAUNCH_DATE.getTime()) / 86400000) + 1;
+}
+function todayKey(){
+  const now = new Date();
+  return now.toISOString().slice(0,10);
+}
+function dateKeyOffset(daysAgo){
+  const d = new Date(Date.now() - daysAgo*86400000);
+  return d.toISOString().slice(0,10);
+}
+
+function pickPuzzle(rng){
+  let best = null;
+  for(let attempt=0; attempt<60; attempt++){
+    const startId = allIds[Math.floor(rng()*allIds.length)];
+    const dist = {}; dist[startId]=0;
+    const queue=[startId];
+    const order=[];
+    while(queue.length){
+      const cur = queue.shift();
+      order.push(cur);
+      for(const n of neighbors(cur)){
+        const nid = nodeId(n.type,n.name);
+        if(!(nid in dist)){ dist[nid]=dist[cur]+1; queue.push(nid); }
+      }
+    }
+    const candidates = order.filter(id => dist[id] >= 4 && dist[id] <= 7);
+    if(candidates.length){
+      const targetId = candidates[Math.floor(rng()*candidates.length)];
+      const cand = {startId, targetId, optimal: dist[targetId]};
+      if(!best || Math.abs(cand.optimal-5) < Math.abs(best.optimal-5)) best = cand;
+      if(cand.optimal>=4) { best = cand; break; }
+    }
+  }
+  if(!best){
+    for(const startId of allIds){
+      const dist = {}; dist[startId]=0; const queue=[startId];
+      while(queue.length){
+        const cur=queue.shift();
+        for(const n of neighbors(cur)){
+          const nid=nodeId(n.type,n.name);
+          if(!(nid in dist)){ dist[nid]=dist[cur]+1; queue.push(nid); }
+        }
+      }
+      const far = Object.keys(dist).filter(id=>dist[id]>=2);
+      if(far.length){ best = {startId, targetId: far[far.length-1], optimal: dist[far[far.length-1]]}; break; }
+    }
+  }
+  return best;
+}
+
+const PROFILE_KEY = 'ciak_catena_profile';
+let profile = loadProfile();
+
+function loadProfile(){
+  try{
+    const raw = localStorage.getItem(PROFILE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return { streak: 0, bestStreak: 0, lastPlayedDay: null, totalGames: 0, totalWins: 0, xp: 0, history: [] };
+}
+function saveProfile(){
+  try{ localStorage.setItem(PROFILE_KEY, JSON.stringify(profile)); }catch(e){}
+}
+function levelFromXp(xp){ return Math.floor(xp/100) + 1; }
+
+function recordDailyCompletion(won){
+  const today = todayKey();
+  const already = profile.history.find(h => h.date === today);
+  if(already){ already.won = already.won || won; saveProfile(); return; }
+  const yesterday = dateKeyOffset(1);
+  if(profile.lastPlayedDay === yesterday){ profile.streak += 1; }
+  else if(profile.lastPlayedDay !== today){ profile.streak = 1; }
+  profile.lastPlayedDay = today;
+  profile.bestStreak = Math.max(profile.bestStreak || 0, profile.streak);
+  profile.totalGames += 1;
+  if(won) profile.totalWins += 1;
+  profile.history.push({ date: today, won });
+  if(profile.history.length > 30) profile.history.shift();
+  saveProfile();
+}
+
+function addXp(amount){
+  profile.xp = (profile.xp||0) + amount;
+  saveProfile();
+  updateProfileUI();
+}
+
+function updateProfileUI(){
+  els.streakCount.textContent = profile.streak || 0;
+  const level = levelFromXp(profile.xp || 0);
+  els.levelNum.textContent = level;
+  const pct = (profile.xp || 0) % 100;
+  els.xpFill.style.width = pct + '%';
+  renderWeekRow();
+}
+
+function renderWeekRow(){
+  els.weekRow.innerHTML = '';
+  for(let i=6;i>=0;i--){
+    const key = dateKeyOffset(i);
+    const entry = profile.history.find(h => h.date === key);
+    const div = document.createElement('div');
+    div.className = 'week-day';
+    if(entry) div.className += entry.won ? ' won' : ' played';
+    div.title = key;
+    els.weekRow.appendChild(div);
+  }
+}
+
+const MASCOT_MESSAGES = {
+  welcome: ["Ciao! Sono Pop 🍿 Pronto per la sfida di oggi?", "Bentornato! Vediamo cosa sa fare la tua memoria cinefila."],
+  correct: ["Ottimo collegamento!", "Sì! Proprio così.", "Bravo, continua così!", "Esatto, sei sulla strada giusta."],
+  wrong: ["Non è collegato... riprova!", "Hmm, non torna. Controlla il nome.", "Quasi! Ma quel collegamento non esiste."],
+  win: ["Catena completata! Sei un vero cinefilo 🎬", "Fantastico, ce l'hai fatta!", "Che catena perfetta!"],
+  giveup: ["Va bene, capita a tutti. Domani andrà meglio!", "Niente paura, ritenta domani!"],
+  streak: ["giorni di fila! Sei in fiamme 🔥"],
+  arcade: ["Modalità arcade: collega quanti vuoi!", "Allenati senza pressione, qui si gioca per divertirsi."],
+};
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+function setMascotMouth(kind){
+  const mouth = document.getElementById('mascotMouth');
+  const browL = document.getElementById('eyebrowL');
+  const browR = document.getElementById('eyebrowR');
+  if(kind === 'happy'){
+    mouth.setAttribute('d', 'M68 94 Q80 110 92 94');
+    browL.setAttribute('d', 'M54 56 L74 56');
+    browR.setAttribute('d', 'M86 56 L106 56');
+  } else if(kind === 'sad'){
+    mouth.setAttribute('d', 'M68 102 Q80 92 92 102');
+    browL.setAttribute('d', 'M55 62 L74 56');
+    browR.setAttribute('d', 'M86 56 L105 62');
+  } else if(kind === 'celebrate'){
+    mouth.setAttribute('d', 'M65 92 Q80 112 95 92');
+    browL.setAttribute('d', 'M53 54 L74 53');
+    browR.setAttribute('d', 'M86 53 L107 54');
+  } else {
+    mouth.setAttribute('d', 'M70 96 Q80 104 90 96');
+    browL.setAttribute('d', 'M55 60 L74 58');
+    browR.setAttribute('d', 'M86 58 L105 60');
+  }
+}
+
+function mascotReact(kind, customText){
+  const figure = els.mascotFigure;
+  figure.classList.remove('bounce','shake');
+  void figure.offsetWidth;
+  let text;
+  if(kind === 'correct'){ setMascotMouth('happy'); figure.classList.add('bounce'); text = pick(MASCOT_MESSAGES.correct); }
+  else if(kind === 'wrong'){ setMascotMouth('sad'); figure.classList.add('shake'); text = pick(MASCOT_MESSAGES.wrong); }
+  else if(kind === 'win'){ setMascotMouth('celebrate'); figure.classList.add('bounce'); showSparkles(); text = pick(MASCOT_MESSAGES.win); }
+  else if(kind === 'giveup'){ setMascotMouth('sad'); text = pick(MASCOT_MESSAGES.giveup); }
+  else if(kind === 'arcade'){ setMascotMouth('neutral'); text = pick(MASCOT_MESSAGES.arcade); }
+  else if(kind === 'streakmsg'){ setMascotMouth('celebrate'); showSparkles(); text = customText; }
+  else { setMascotMouth('neutral'); text = pick(MASCOT_MESSAGES.welcome); }
+  if(customText && kind !== 'streakmsg') text = customText;
+  els.mascotText.textContent = text;
+}
+
+function showSparkles(){
+  document.querySelectorAll('.sparkle').forEach(s => {
+    s.classList.remove('show');
+    void s.offsetWidth;
+    s.classList.add('show');
+  });
+}
+
+let state = { startId:null, targetId:null, optimal:0, chain:[], finished:false, isDaily:false };
+
+const els = {
+  dayNum: document.getElementById('dayNum'),
+  stepCount: document.getElementById('stepCount'),
+  optimalCount: document.getElementById('optimalCount'),
+  startName: document.getElementById('startName'),
+  targetName: document.getElementById('targetName'),
+  chain: document.getElementById('chain'),
+  guessInput: document.getElementById('guessInput'),
+  autocomplete: document.getElementById('autocomplete'),
+  errorMsg: document.getElementById('errorMsg'),
+  nextTypeHint: document.getElementById('nextTypeHint'),
+  newGameBtn: document.getElementById('newGameBtn'),
+  giveUpBtn: document.getElementById('giveUpBtn'),
+  result: document.getElementById('result'),
+  resultTitle: document.getElementById('resultTitle'),
+  resultDetail: document.getElementById('resultDetail'),
+  resultSquares: document.getElementById('resultSquares'),
+  shareBtn: document.getElementById('shareBtn'),
+  clapOverlay: document.getElementById('clapOverlay'),
+  mascotFigure: document.getElementById('mascotFigure'),
+  mascotText: document.getElementById('mascotText'),
+  streakCount: document.getElementById('streakCount'),
+  levelNum: document.getElementById('levelNum'),
+  xpFill: document.getElementById('xpFill'),
+  weekRow: document.getElementById('weekRow'),
+};
+
+function displayLabel(id){
+  const n = allNodes[id];
+  if(n.type === FILM) return n.name + " (" + movieYear[n.name] + ")";
+  return n.name;
+}
+
+function startDailyGame(){
+  const seed = hashStr(todayKey());
+  const rng = mulberry32(seed);
+  const puzzle = pickPuzzle(rng);
+  loadPuzzle(puzzle, true);
+  els.dayNum.textContent = "#" + dayNumber();
+  const alreadyToday = profile.history.find(h => h.date === todayKey());
+  if(alreadyToday){
+    mascotReact('welcome', 'Hai già giocato oggi: streak di ' + profile.streak + ' giorni. Torna domani per continuare!');
+  } else if(profile.streak >= 1){
+    mascotReact('welcome', 'Bentornato! Sei a ' + profile.streak + ' giorni di fila, non rompere la catena 🔥');
+  } else {
+    mascotReact('welcome');
+  }
+}
+
+function startRandomGame(){
+  const rng = Math.random;
+  const puzzle = pickPuzzle(rng);
+  loadPuzzle(puzzle, false);
+  els.dayNum.textContent = "arcade";
+  mascotReact('arcade');
+}
+
+function loadPuzzle(puzzle, isDaily){
+  state = {
+    startId: puzzle.startId,
+    targetId: puzzle.targetId,
+    optimal: puzzle.optimal,
+    chain: [puzzle.startId],
+    finished: false,
+    isDaily: !!isDaily,
+  };
+  els.startName.textContent = displayLabel(state.startId);
+  els.targetName.textContent = displayLabel(state.targetId);
+  els.optimalCount.textContent = state.optimal;
+  els.result.classList.remove('show');
+  els.errorMsg.textContent = '';
+  els.guessInput.disabled = false;
+  els.guessInput.value = '';
+  render();
+  els.guessInput.focus();
+}
+
+function lastNode(){ return state.chain[state.chain.length-1]; }
+
+function render(){
+  els.chain.innerHTML = '';
+  state.chain.forEach((id) => {
+    const n = allNodes[id];
+    const div = document.createElement('div');
+    div.className = 'node';
+    div.innerHTML = `<div class="node-card ${n.type}">
+        <span>${n.type===FILM ? n.name + ' · ' + movieYear[n.name] : n.name}</span>
+        <span class="node-tag">${n.type}</span>
+      </div>`;
+    els.chain.appendChild(div);
+  });
+  if(!state.finished){
+    const tn = allNodes[state.targetId];
+    const div = document.createElement('div');
+    div.className = 'node';
+    div.innerHTML = `<div class="node-card target">
+        <span>${tn.type===FILM ? tn.name + ' · ' + movieYear[tn.name] : tn.name}</span>
+        <span class="node-tag">obiettivo · ${tn.type}</span>
+      </div>`;
+    els.chain.appendChild(div);
+  }
+  els.stepCount.textContent = state.chain.length - 1;
+  const last = allNodes[lastNode()];
+  const nextType = last.type === FILM ? ATTORE : FILM;
+  els.nextTypeHint.textContent = nextType;
+}
+
+function triggerClap(){
+  els.clapOverlay.classList.remove('go');
+  void els.clapOverlay.offsetWidth;
+  els.clapOverlay.classList.add('go');
+}
+
+function tryAddGuess(rawName){
+  if(state.finished) return;
+  const name = rawName.trim();
+  if(!name) return;
+  const last = allNodes[lastNode()];
+  const nextType = last.type === FILM ? ATTORE : FILM;
+  const candidates = neighbors(lastNode()).filter(n => n.type === nextType);
+  const match = candidates.find(n => n.name.toLowerCase() === name.toLowerCase());
+  if(!match){
+    els.errorMsg.textContent = 'Nessun collegamento valido con questo nome. Riprova.';
+    mascotReact('wrong');
+    return;
+  }
+  const matchId = nodeId(match.type, match.name);
+  if(state.chain.includes(matchId)){
+    els.errorMsg.textContent = 'Questo anello è già nella catena.';
+    mascotReact('wrong');
+    return;
+  }
+  els.errorMsg.textContent = '';
+  state.chain.push(matchId);
+  triggerClap();
+  render();
+  els.guessInput.value = '';
+  els.autocomplete.style.display = 'none';
+  addXp(10);
+  if(matchId === state.targetId){
+    finishGame(true);
+  } else {
+    mascotReact('correct');
+  }
+}
+
+function finishGame(won){
+  state.finished = true;
+  els.guessInput.disabled = true;
+  render();
+  const used = state.chain.length - 1;
+  els.resultTitle.textContent = won ? 'Catena completata!' : 'Ecco la soluzione';
+  els.resultDetail.textContent = won
+    ? `Hai collegato la catena in ${used} passaggi (il migliore percorso è ${state.optimal}).`
+    : `Il percorso più breve era di ${state.optimal} passaggi.`;
+  const extra = Math.max(0, used - state.optimal);
+  let squares = '🟩'.repeat(state.optimal);
+  squares += '🟥'.repeat(extra);
+  els.resultSquares.textContent = squares;
+  els.result.classList.add('show');
+  if(won) addXp(20);
+  if(state.isDaily){
+    const prevStreak = profile.streak;
+    recordDailyCompletion(won);
+    if(won && profile.streak > prevStreak && profile.streak > 1){
+      mascotReact('streakmsg', profile.streak + ' ' + pick(MASCOT_MESSAGES.streak));
+    } else {
+      mascotReact(won ? 'win' : 'giveup');
+    }
+  } else {
+    mascotReact(won ? 'win' : 'giveup');
+  }
+  updateProfileUI();
+}
+
+function giveUp(){
+  if(state.finished) return;
+  const path = bfsPath(lastNode(), state.targetId);
+  if(path){
+    for(let i=1;i<path.length;i++){
+      state.chain.push(path[i]);
+    }
+  }
+  finishGame(false);
+}
+
+function updateAutocomplete(){
+  const q = els.guessInput.value.trim().toLowerCase();
+  const last = allNodes[lastNode()];
+  const nextType = last.type === FILM ? ATTORE : FILM;
+  const candidates = neighbors(lastNode())
+    .filter(n => n.type === nextType)
+    .filter(n => !state.chain.includes(nodeId(n.type, n.name)));
+  const filtered = q ? candidates.filter(n => n.name.toLowerCase().includes(q)) : candidates;
+  if(!filtered.length){
+    els.autocomplete.style.display = 'none';
+    return;
+  }
+  els.autocomplete.innerHTML = '';
+  filtered.slice(0, 8).forEach(n => {
+    const div = document.createElement('div');
+    div.className = 'ac-item';
+    const label = n.type===FILM ? n.name + ' · ' + movieYear[n.name] : n.name;
+    div.innerHTML = `<span>${label}</span><span class="ac-tag">${n.type}</span>`;
+    div.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      tryAddGuess(n.name);
+    });
+    els.autocomplete.appendChild(div);
+  });
+  els.autocomplete.style.display = 'block';
+}
+
+els.guessInput.addEventListener('input', updateAutocomplete);
+els.guessInput.addEventListener('focus', updateAutocomplete);
+els.guessInput.addEventListener('blur', () => {
+  setTimeout(() => { els.autocomplete.style.display = 'none'; }, 120);
+});
+els.guessInput.addEventListener('keydown', (e) => {
+  if(e.key === 'Enter'){ tryAddGuess(els.guessInput.value); }
+});
+
+els.newGameBtn.addEventListener('click', startRandomGame);
+els.giveUpBtn.addEventListener('click', giveUp);
+
+els.shareBtn.addEventListener('click', () => {
+  const used = state.chain.length - 1;
+  const extra = Math.max(0, used - state.optimal);
+  const squares = '🟩'.repeat(state.optimal) + '🟥'.repeat(extra);
+  const text = `🎬 Ciak! Catena ${els.dayNum.textContent} — ${used}/${state.optimal} passaggi\n${squares}`;
+  navigator.clipboard?.writeText(text).then(() => {
+    els.shareBtn.textContent = 'Copiato!';
+    setTimeout(() => { els.shareBtn.textContent = 'Copia per condividere'; }, 1500);
+  }).catch(() => {
+    els.shareBtn.textContent = 'Copia manualmente: ' + text;
+  });
+});
+
+updateProfileUI();
+startDailyGame();
+</script>
+</body>
+</html>
